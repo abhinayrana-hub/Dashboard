@@ -1,203 +1,94 @@
-/* eslint-disable no-mixed-operators */
 import React from 'react';
 import './App.css';
-import Layout from './components/Layout';
-import ProfileLogo from '../src/data//avatar.jpg';
-import {
-    ChevronDownIcon,
-    PlusIcon,
-    DotsVerticalIcon,
-    PlusCircleIcon,
-} from "@heroicons/react/outline";
-import CardItem from "../src/components/CardItem";
-import BoardData from "../src/data/board-data.json";
-import { DragDropContext,Draggable, Droppable } from "react-beautiful-dnd";
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Manage, AddProject, Board , Schedule, Report, Settings } from './pages';
+import SideBar from './components/SideBar';
+import TopBar from './components/TopBar';
+/* import Tippy from '@tippyjs/react';
+import { FiSettings } from 'react-icons/fi'; */
+import { useStateContext } from './contexts/ContextProvider';
 
-function createGuidId() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
-}
 
-    const App = () => {
 
-    const [ready, setReady] = useState(false);
-    const [boardData, setBoardData] = useState(BoardData);
-    const [showForm, setShowForm] = useState(false);
-    const [selectedBoard, setSelectedBoard] = useState(0);
+const App = () => {
 
-    useEffect(() => {
-        if (window !== 'undefined') {
-            setReady(true);
-        }
-    }, []);
+    const { activeMenu } = useStateContext();
 
-    const onDragEnd = (re) => {
-        if (!re.destination) return;
-        let newBoardData = boardData;
-        var dragItem =
-            newBoardData[parseInt(re.source.droppableId)].items[re.source.index];
-        newBoardData[parseInt(re.source.droppableId)].items.splice(
-            re.source.index,
-            1
-        );
-        newBoardData[parseInt(re.destination.droppableId)].items.splice(
-            re.destination.index,
-            0,
-            dragItem
-        );
-        setBoardData(newBoardData);
-    };
+    /* useEffect(() => {
+      const currentThemeColor = localStorage.getItem('colorMode');
+      const currentThemeMode = localStorage.getItem('themeMode');
+      if (currentThemeColor && currentThemeMode) {
+        setCurrentColor(currentThemeColor);
+        setCurrentMode(currentThemeMode);
+      }
+        }, []); */
 
-    const onTextAreaKeyPress = (e) => {
-        if (e.keyCode === 13) //Enter
-        {
-            const val = e.target.value;
-            if (val.length === 0) {
-                setShowForm(false);
+        return(
+            
+    <div className='min-w-full min-h-screen  h-screen overflow-hidden bg-blue-100'>
+        <BrowserRouter>
+        <div className="flex relative dark:bg-main-dark-bg">
+          {/* <div className="fixed right-4 bottom-4" style={{ zIndex: '1000' }}>
+            <Tippy
+              content="Settings"
+              position="Top"
+            >
+              <button
+                type="button"
+                onClick={() => {}}
+                style={{ background: 'cyan', borderRadius: '50%' }}
+                className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
+              >
+                <FiSettings >x</FiSettings>
+              </button>
+
+            </Tippy>
+          </div> */}
+
+           
+
+          {activeMenu ? (
+            <div className="w-50 fixed dark:bg-secondary-dark-bg bg-purple-200">
+              <SideBar />
+            </div>
+          ) : (
+            <div className="w-0 dark:bg-secondary-dark-bg">
+              <SideBar />
+            </div>
+          )}
+          <div
+            className={ `flex flex-col dark:bg-main-dark-bg  bg-main-bg min-h-screen w-full ${activeMenu ? 'md:ml-[202px]' : 'flex-2'
+          }`
             }
-            else {
-                const boardId = e.target.attributes['data-id'].value;
-                const item = {
-                    id: createGuidId(),
-                    title: val,
-                    priority: 0,
-                    chat: 0,
-                    attachment: 0,
-                    assignees: []
-                }
-                let newBoardData = boardData;
-                newBoardData[boardId].items.push(item);
-                setBoardData(newBoardData);
-                setShowForm(false);
-                e.target.value = '';
-            }
-        }
-    }
-        return (
-            /* Flex Container  */
-            <Layout>
-                <div className="p-10 flex flex-col h-screen">
-                    {/* Board header */}
-                    <div className="flex flex-initial justify-between">
-                        <div className="flex items-center">
-                            <h4 className="text-4xl font-bold text-gray-600">Studio Board</h4>
-                            <ChevronDownIcon
-                                className="w-9 h-9 text-gray-500 rounded-full
-            p-1 bg-white ml-5 shadow-xl"
-                            />
-                        </div>
+          >
+            
+            
+            <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg w-full ">
+              <TopBar />
+            </div>
+            
+            <div>
+              {/* {themeSettings && (<ThemeSettings />)} */}
 
-                        <ul className="flex space-x-3">
-                            <li>
-                                <img
-                                    className="rounded-full h-10 w-10 object-cover"
-                                    src={ProfileLogo}
-                                    alt="user-profile"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    className="rounded-full h-10 w-10 object-cover"
-                                    src={ProfileLogo}
-                                    alt="user-profile"
-                                />
-                            </li>
-                            <li>
-                                <img
-                                    className="rounded-full h-10 w-10 object-cover"
-                                    src={ProfileLogo}
-                                    alt="user-profile"
-                                />
-                            </li>
-                            <li>
-                                <button
-                                    className="border border-dashed flex items-center w-9 h-9 border-gray-500 justify-center
-                rounded-full">
-                                    <PlusIcon className="w-5 h-5 text-gray-500" />
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
+               <Routes>
+                                {/* pages  */}
+                                <Route path="/" element={<AddProject />} />
+                                <Route path="/manage" element={<Manage />} />
+                                <Route path="/addproject" element={<AddProject />} />
+                                <Route path="/board" element={<Board />} />
+                                <Route path="schedule" element={<Schedule />} />
+                                <Route path="/report" element={<Report />} />
+                                <Route path="/settings" element={<Settings />} />
+                            </Routes>
+            </div>
 
-                    {/* Board columns */}
-                    {ready && (
-                        <DragDropContext onDragEnd={onDragEnd}>
-                            <div className="grid grid-cols-4 gap-5 my-5">
-                                {boardData.map((board, bIndex) => {
-                                    return (
-                                        <div key={board.name}>
-                                            <Droppable droppableId={bIndex.toString()}>
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        {...provided.droppableProps}
-                                                        ref={provided.innerRef}
-                                                    >
-                                                        <div
-                                                            className={`bg-gray-100 rounded-md shadow-md
-                            flex flex-col relative overflow-hidden
-                            ${snapshot.isDraggingOver && "bg-green-100"}`}
-                                                        >
-                                                            <span
-                                                                className="w-full h-1 bg-gradient-to-r from-pink-700 to-red-200
-                          absolute inset-x-0 top-0"
-                                                            ></span>
-                                                            <h4 className=" p-3 flex justify-between items-center mb-2">
-                                                                <span className="text-2xl text-gray-600">
-                                                                    {board.name}
-                                                                </span>
-                                                                <DotsVerticalIcon className="w-5 h-5 text-gray-500" />
-                                                            </h4>
-
-                                                            <div className="overflow-y-auto overflow-x-hidden h-auto"
-                                                                style={{ maxHeight: 'calc(100vh - 290px)' }}>
-                                                                {board.items.length > 0 &&
-                                                                    board.items.map((item, iIndex) => {
-                                                                        return (
-                                                                            <CardItem
-                                                                                key={item.id}
-                                                                                data={item}
-                                                                                index={iIndex}
-                                                                                className="m-3"
-                                                                            />
-                                                                        );
-                                                                    })}
-                                                                {provided.placeholder}
-                                                            </div>
-
-                                                            {
-                                                                showForm && selectedBoard === bIndex ? (
-                                                                    <div className="p-3">
-                                                                        <textarea className="border-gray-300 rounded focus:ring-purple-400 w-full"
-                                                                            rows={3} placeholder="Task info"
-                                                                            data-id={bIndex}
-                                                                            onKeyDown={(e) => onTextAreaKeyPress(e)} />
-                                                                    </div>
-                                                                ) : (
-                                                                    <button
-                                                                        className="flex justify-center items-center my-3 space-x-2 text-lg"
-                                                                        onClick={() => { setSelectedBoard(bIndex); setShowForm(true); }}
-                                                                    >
-                                                                        <span>Add task</span>
-                                                                        <PlusCircleIcon className="w-5 h-5 text-gray-500" />
-                                                                    </button>
-                                                                )
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </Droppable>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </DragDropContext>
-                    )}
-                </div>
-            </Layout>
-
+        </div>
+            
+          </div>
+        
+      </BrowserRouter>
+    </div>
+    
         );
     }
 
