@@ -1,47 +1,69 @@
 import React from 'react';
-import { UserGroupIcon, ServerIcon, CalendarIcon, ChartSquareBarIcon,PlusCircleIcon, CogIcon
- } from '@heroicons/react/outline';
+import { Link, NavLink } from 'react-router-dom';
+import { MdOutlineCancel } from 'react-icons/md';
+import { links } from '../data/constdata';
+import { useStateContext } from '../contexts/ContextProvider'; 
+import Tippy from '@tippyjs/react';
+import { AiFillCar } from 'react-icons/ai';
 
 const SideBar = (props) => {
+
+    const {   activeMenu, setActiveMenu, screenSize, 
+         } = useStateContext();
+    
+
+    
+  const handleCloseSideBar = () => {
+    if (activeMenu !== undefined && screenSize <= 900) {
+      setActiveMenu(false);
+    }
+  };
+
+  const activeLink = 'flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg  text-white  text-md m-2';
+  const normalLink = 'flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md text-gray-700 dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2';
+
   return (
-    <div className="fixed inset-y-0 left-0 bg-white w-40">
-        <h1 className="flex items-center justify-center text-2xl
-            h-16 bg-purple-600 text-white font-bold">Gm DashBoard</h1>
-
-            <ul className="flex flex-col text-lg h-full">
-                <li className="flex justify-center items-center flex-col
-                py-7 text-gray-500">
-                    <UserGroupIcon className="w-7 h-7"/>
-                    Manage
-                </li>
-                <li className="flex justify-center items-center flex-col
-                py-7 text-gray-500">
-                    <PlusCircleIcon className="w-7 h-7"/>
-                    Add Project
-                </li>
-                <li className="flex justify-center items-center flex-col
-                py-7 border-l-4 border-purple-500 text-purple-500
-                font-bold">
-                    <ServerIcon className="w-7 h-7 text-purple-500"/>
-                    Boards
-                </li>
-                <li className="flex justify-center items-center flex-col
-                py-7 text-gray-500">
-                    <CalendarIcon className="w-7 h-7"/>
-                    Schedule
-                </li>
-                <li className="flex justify-center items-center flex-col
-                py-7 text-gray-500">
-                    <ChartSquareBarIcon className="w-7 h-7"/>
-                    Report
-                </li>
-
-                <li className="flex justify-center items-center flex-col
-                py-7 text-gray-500 mt-auto mb-16">
-                    <CogIcon className="w-7 h-7"/>
-                    Settings
-                </li>
-            </ul>
+    <div className="ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10">
+      {activeMenu && (
+        <>
+          <div className="flex justify-between items-center">
+            <Link to="/" onClick={handleCloseSideBar} className="flex items-center justify-center text-2xl
+            h-14 bg-purple-600 text-white font-bold">
+              <AiFillCar className="h-5 w-5"/> <span>Gm DashBoard</span>
+            </Link>
+            <Tippy content="Menu" position="BottomCenter">
+              <button
+                type="button"
+                onClick={() => setActiveMenu(!activeMenu)}
+                
+                className="text-xl rounded-full p-3 hover:bg-light-gray mt-4 block md:hidden"
+              >
+                <MdOutlineCancel />
+              </button>
+            </Tippy>
+          </div>
+          <div className="mt-10 ">
+            {links.map((item) => (
+              <div key={item.title}>
+                <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
+                  {item.title}
+                </p>
+                {item.links.map((link) => (
+                  <NavLink
+                    to={`/${link.name}`}
+                    key={link.name}
+                    onClick={handleCloseSideBar}
+                    className={({ isActive }) => (isActive ? activeLink : normalLink)}
+                  >
+                     {link.icon}
+                    <span className="capitalize ">{link.name}</span>
+                  </NavLink>
+                ))}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
